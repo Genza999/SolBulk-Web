@@ -1,0 +1,367 @@
+:root {
+    --primary-color: #6C5CE7;
+    --secondary-color: #00CEC9;
+    --accent-color: #FD79A8;
+    --background-color: #F0F3F8;
+    --text-color: #2D3436;
+  }
+  
+body {
+background-color: var(--background-color);
+color: var(--text-color);
+display: flex;
+flex-direction: column;
+min-height: 100vh;
+margin: 0;
+padding: 0;
+}
+
+
+.btn {
+    background: linear-gradient(45deg, #e94560, #0f3460);
+    border: none;
+    border-radius: 25px;
+    color: #fff;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(233, 69, 96, 0.4);
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.logo {
+    animation: pulse 2s infinite;
+}
+
+.float-label {
+    position: relative;
+    margin-bottom: 20px;
+}
+  
+.float-label input {
+    width: 100%;
+    padding: 10px 0;
+    border: none;
+    border-bottom: 2px solid var(--primary-color);
+    background-color: transparent;
+    outline: none;
+}
+  
+.float-label label {
+    position: absolute;
+    top: 10px;
+    left: 0;
+    transition: all 0.3s ease;
+    pointer-events: none;
+    color: rgba(0, 0, 0, 0.5);
+}
+  
+.float-label input:focus + label,
+.float-label input:not(:placeholder-shown) + label {
+    transform: translateY(-20px);
+    font-size: 12px;
+    color: var(--primary-color);
+}
+  
+.float-label input:focus {
+    border-bottom-color: var(--accent-color);
+}
+
+.section {
+    margin: 0;
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+
+}
+
+.button-position {
+    text-align: center;
+}
+
+.form {
+    margin-top: 50px;
+}
+
+.text-input {
+    width: 600px;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    font-size: 16px;
+    border: 2px solid #ddd;
+    border-radius: 30px;
+    outline: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.text-input:focus {
+    border-color: #191970;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+}
+
+.send-input {
+    width: 600px;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    font-size: 16px;
+    border: 2px solid #ddd;
+    border-radius: 30px;
+    outline: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.send-input:hover {
+    background-color: #45a049; /* Darker shade for hover effect */
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+.public-key {
+    font-family: 'Comic-Sans', sans-serif;
+    font-size: 20px;
+    font-weight: bold;
+    color: #1C1C1C;
+    line-height: 1.2;
+    text-align: center;
+    margin: 20px;
+    background: linear-gradient(to right, #1C1C1C, #1C1C1C);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.sol-balance {
+    display: block;
+    font-size: 18px;
+    font-weight: normal;
+    color: #666;
+}
+
+.alert {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    font-weight: 500;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transform: translateX(120%);
+    transition: transform 0.3s ease-out;
+    z-index: 1000;
+}
+  
+.alert.show {
+    transform: translateX(0);
+}
+  
+.alert-success {
+    background: linear-gradient(45deg, rgba(0, 255, 0, 0.2), rgba(0, 255, 0, 0.1));
+    border-left: 4px solid #00ff00;
+}
+  
+.alert-error {
+    background: linear-gradient(45deg, rgba(255, 0, 0, 0.2), rgba(255, 0, 0, 0.1));
+    border-left: 4px solid #ff0000;
+}
+  
+.alert-info {
+    background: linear-gradient(45deg, rgba(0, 123, 255, 0.2), rgba(0, 123, 255, 0.1));
+    border-left: 4px solid #007bff;
+}
+  
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+  
+.alert.fade-out {
+    animation: fadeOut 0.5s ease-out forwards;
+}
+
+.contact-footer {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 20px 0;
+    margin-top: 200px;
+}
+
+.contact-container {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+    color: #000;
+}
+
+.contact-container h5 {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #e94560;
+}
+
+.contact-info {
+    margin: 20px 0;
+}
+
+.contact-info p {
+    margin: 5px 0;
+}
+
+.social-links {
+    margin-top: 20px;
+}
+
+.social-links a {
+    color: #556ee6;
+    font-size: 24px;
+    margin: 0 10px;
+    transition: color 0.3s ease;
+    display: inline-block;
+}
+
+.social-links a:hover {
+    color: #e94560;
+    transform: translateY(-3px);
+}
+
+/* Add this new style for the email icon to match the other icons */
+.social-links a .fa-envelope {
+    font-size: 22px; /* Slightly smaller to visually match other icons */
+}
+
+/* Add this to your existing styles */
+.site-header {
+    background: rgba(15, 52, 96, 0.8);
+    backdrop-filter: blur(10px);
+    padding: 40px 20px;
+    margin-bottom: 30px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.header-content {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+    color: #fff;
+}
+
+.header-content h1 {
+    font-size: 36px;
+    margin-bottom: 20px;
+    color: #e94560;
+}
+
+.site-description {
+    font-size: 18px;
+    line-height: 1.6;
+}
+
+.site-description ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 20px 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.site-description li {
+    margin: 10px 20px;
+    display: flex;
+    align-items: center;
+}
+
+.site-description li i {
+    margin-right: 10px;
+    color: #e94560;
+}
+
+@media (max-width: 600px) {
+    .site-description ul {
+        flex-direction: column;
+    }
+}
+
+    /* Add this to your existing styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background: rgba(15, 52, 96, 0.95);
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #e94560;
+    width: 80%;
+    max-width: 500px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(233, 69, 96, 0.3);
+    color: #fff;
+}
+
+.modal h2 {
+    color: #e94560;
+    margin-bottom: 20px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.modal-actions button {
+    margin-left: 10px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.modal-actions button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.btn-success {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.btn-danger {
+    background-color: #f44336;
+    color: white;
+}
+
+
+#outputContainer {
+    max-height: 200px; /* Set a max height for the address list */
+    overflow-y: auto; /* Make the address list scrollable if it exceeds max height */
+    margin-bottom: 20px;
+}

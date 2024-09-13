@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SolBulk</title>
+    <link rel="icon" href="static/images/icon.svg" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+
+    <script src="https://cdn.jsdelivr.net/npm/buffer@6.0.3/index.js"></script>
+    <script>
+        var Buffer = buffer.Buffer;
+    </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://unpkg.com/@solana/web3.js@1.30.2/lib/index.iife.min.js"></script>
+    <script src="static/js/config.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="static/css/index.css">
+
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-content">
+            <h1>SolBulk</h1>
+            <div class="site-description">
+                <p>Welcome to SolBulk, your go-to platform for efficient and secure bulk transactions on the Solana blockchain.</p>
+                <ul>
+                    <li><i class="fas fa-bolt"></i> Instantly distribute SOL to multiple addresses</li>
+                    <li><i class="fas fa-shield-alt"></i> Secure and transparent transactions</li>
+                    <li><i class="fas fa-coins"></i> Optimize your payment distribution</li>
+                    <li><i class="fas fa-tachometer-alt"></i> Leverage Solana's high-speed network</li>
+                </ul>
+            </div>
+        </div>
+    </header>
+    <div id="walletInfo" style="position: absolute; top: 10px; right: 10px; background-color: #556EE6; padding: 10px; border-radius: 5px; font-size: 14px; display: none;">
+        Connected: <span id="walletAddress"></span>
+    </div>
+    <div id="alertContainer"></div>
+    <div class="section">
+        <img src="static/images/icon.svg" alt="" class="logo" style="height:300px;width:300px;margin-left: 150px;">
+
+        <div class="button-position">
+            <button id="login-button" onclick="phantomLogin()" class="btn btn-outline-primary waves-effect waves-light">Connect to your Wallet</button>
+        </div>
+
+        <div id="card" class="card bg-soft" style="background-color: #AB9FF2; border-radius: 50px;display: none;">
+            <div>
+                    
+                <div>
+                    <div class="sol-balance" style="display: none;text-align: center;color: #FFFFFF;padding:5px;">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center;">
+            Send SOL evenly across addresses
+        </div>
+
+        <div class="form">
+            <div class="float-label" style="display: none;">
+                <input type="text" id="solInput" placeholder=" ">
+                <label for="solInput">SOL</label>
+            </div>
+            <div style="display: flex; align-items: center;">
+                <div class="float-label" style="display: none;" id="solAddressInputlabel">
+                    <input type="text" id="solAddressInput" placeholder=" " style="display: none;width:500px;">
+                    <label for="solAddressInput">SOL Address</label>
+                </div>
+                <button id="addAddressBtn" class="text-input" style="display: none;margin-left: 10px;width:100px; transition: background-color 0.3s;background-color: #556EE6;color: #FFFFFF;">Add</button>
+            </div>
+            <div id="feeInfo" style="display: none; text-align: center; margin-top: 10px; font-style: italic;"></div>
+            <div id="outputContainer" style="text-align: center;display: none;color: #556EE6;border-color: #fd7e14;"></div>
+            <button id="submitButton" class="btn send-input" style="display: none; margin-top: 10px;">Send</button>
+
+        </div>
+        <footer class="contact-footer">
+            <div class="contact-container">
+                <h5>Contact Us</h5>
+                <p>Have questions? Reach out to us!</p>
+                <div class="social-links">
+                    <a href="mailto:cartpix@gmail.com" title="Email us"><i class="fas fa-envelope"></i></a>
+                    <a href="https://x.com/solbulk" target="_blank" title="Follow us on Twitter"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+        </footer>
+    </div>
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <h2>Confirm Transaction</h2>
+            <div id="modalContent"></div>
+            <div class="modal-actions">
+                <button id="confirmYes" class="btn btn-success">Confirm</button>
+                <button id="confirmNo" class="btn btn-danger">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        let provider;
+        async function phantomLogin() {
+            const isPhantomInstalled = window.solana && window.solana.isPhantom;
+            if (!isPhantomInstalled) {
+                showAlert("Phantom browser extension is not detected!", "error");
+            } else {
+                try {
+                    provider = window.solana;
+
+                    const resp = await window.solana.connect();
+                    connectAccountAnimation(resp.publicKey.toString());
+                } catch (err) {
+                    console.log("User rejected request");
+                    console.log(err);
+                }
+            }
+        }
+
+        async function connectAccountAnimation(publicKey) {
+            $('#login-button').hide();
+            let publicKeyDiv = $('.public-key').html(publicKey).show();
+            showBalance();
+            updateWalletInfo(publicKey);
+        }
+
+        function updateWalletInfo(publicKey) {
+            const walletAddress = publicKey.toString();
+            document.getElementById('walletAddress').textContent = `${walletAddress.slice(0, 4)}...${walletAddress.slice(-4)}`;
+            document.getElementById('walletInfo').style.display = 'block';
+        }
+
+        async function showBalance(){
+            let provider = window.solana;
+            let initialBalance;
+            let addresses = [];
+
+            let connection = new solanaWeb3.Connection(config.CONNECTION);
+            connection.getBalance(provider.publicKey).then(function (value) {
+                initialBalance = value / 1000000000;
+                let solBalanceDiv = $('.sol-balance').html(initialBalance + ' SOL').show();
+            });
+            
+
+            const submitButton = document.getElementById('submitButton');
+            const solInput = document.getElementById('solInput');
+            const solAddressInput = document.getElementById('solAddressInput');
+            const addAddressBtn = document.getElementById('addAddressBtn');
+            const outputContainer = document.getElementById('outputContainer');
+            const card = document.getElementById('card');
+            document.querySelector('.float-label').style.display = 'block';
+            document.getElementById('solAddressInputlabel').style.display = 'block';
+
+            solInput.style.display = 'block';
+            solAddressInput.style.display = 'block';
+            addAddressBtn.style.display = 'block';
+            card.style.display = 'block';
+
+            solInput.addEventListener('input', function() {
+                let inputValue = parseFloat(this.value) || 0;
+                let remainingBalance = initialBalance - inputValue;
+                if (remainingBalance < 0) {
+                    remainingBalance = 'Insufficient Balance';
+                } else {
+                    remainingBalance = remainingBalance.toFixed(9) + ' SOL';
+                }
+                $('.sol-balance').html(remainingBalance);
+            });
+
+            function addAddress() {
+                outputContainer.style.display = 'block';
+
+                const enteredText = solAddressInput.value.trim();
+                if (enteredText !== '') {
+                    addresses.push(enteredText);
+                    const textOutput = document.createElement('div');
+                    textOutput.className = 'text-output d-flex justify-content-between align-items-center';
+                    textOutput.innerHTML = `
+                        <span>${enteredText}</span>
+                        <button class="btn btn-danger btn-sm delete-address" data-address="${enteredText}">Remove</button>
+                    `;
+                    textOutput.style.border = '1px solid #ccc';
+                    textOutput.style.borderRadius = '10px';
+                    textOutput.style.padding = '10px';
+                    textOutput.style.margin = '10px';
+                    textOutput.style.backgroundColor = '#f8f9fa';
+                    textOutput.style.transition = 'all 0.3s ease';
+                    outputContainer.appendChild(textOutput);
+                    solAddressInput.value = '';
+
+                    submitButton.style.display = 'block';
+                }
+                updateFeeInfo();
+            }
+            function removeAddress(address) {
+                addresses = addresses.filter(a => a !== address);
+                const addressElements = outputContainer.querySelectorAll('.text-output');
+                addressElements.forEach(el => {
+                    if (el.querySelector('span').textContent === address) {
+                        el.remove();
+                    }
+                });
+    
+                if (addresses.length === 0) {
+                    submitButton.style.display = 'none';
+                }
+            }
+    
+            outputContainer.addEventListener('click', function(event) {
+                if (event.target.classList.contains('delete-address')) {
+                    const addressToRemove = event.target.getAttribute('data-address');
+                    removeAddress(addressToRemove);
+                }
+            });
+            addAddressBtn.addEventListener('click', addAddress);
+    
+            solAddressInput.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    addAddress();
+                }
+            });
+
+            submitButton.addEventListener('click', async function() {
+                const solAmount = parseFloat(solInput.value);
+                if (isNaN(solAmount) || solAmount <= 0) {
+                    showAlert('Please enter a valid SOL amount', "error");
+                    return;
+                }
+
+                // Define the fee and fee recipient
+                const feePercentage = 0.01; // 1% fee
+                const feeRecipientAddress = config.FEE_WALLET_ADDRESS;
+                const feeRecipient = new solanaWeb3.PublicKey(feeRecipientAddress);
+
+                const totalFee = solAmount * feePercentage;
+                const amountAfterFee = solAmount - totalFee;
+                const amountPerAddress = amountAfterFee / addresses.length;
+
+                const confirmMessage = `
+                    <p><strong>Total amount:</strong> ${solAmount.toFixed(9)} SOL</p>
+                    <p><strong>Fee:</strong> ${totalFee.toFixed(9)} SOL</p>
+                    <p><strong>Amount after fee:</strong> ${amountAfterFee.toFixed(9)} SOL</p>
+                    <p><strong>Total number of addresses:</strong> ${addresses.length}</p>
+                    <p><strong>Amount per address:</strong> ${amountPerAddress.toFixed(9)} SOL</p>
+                    <p>Do you want to proceed with this transaction?</p>
+                `;
+
+                const confirmed = await showConfirmModal(confirmMessage);
+                if (!confirmed) {
+                    return;
+                }
+    
+                const connection = new solanaWeb3.Connection(config.CONNECTION);
+                const fromWallet = window.solana;
+    
+                try {
+                    await fromWallet.connect();
+                    const transaction = new solanaWeb3.Transaction();
+
+                    // Add fee transfer instruction
+                    const feeInstruction = solanaWeb3.SystemProgram.transfer({
+                        fromPubkey: fromWallet.publicKey,
+                        toPubkey: feeRecipient,
+                        lamports: solanaWeb3.LAMPORTS_PER_SOL * totalFee
+                    });
+                    transaction.add(feeInstruction);
+    
+                    // Add transfer instructions for each recipient
+                    for (let address of addresses) {
+                        const toPublicKey = new solanaWeb3.PublicKey(address);
+                        const transferInstruction = solanaWeb3.SystemProgram.transfer({
+                            fromPubkey: fromWallet.publicKey,
+                            toPubkey: toPublicKey,
+                            lamports: solanaWeb3.LAMPORTS_PER_SOL * amountPerAddress
+                        });
+                        transaction.add(transferInstruction);
+                    }
+    
+                    const { blockhash } = await connection.getRecentBlockhash();
+                    transaction.recentBlockhash = blockhash;
+                    transaction.feePayer = fromWallet.publicKey;
+    
+                    const signed = await fromWallet.signTransaction(transaction);
+                    const signature = await connection.sendRawTransaction(signed.serialize());
+                    // Wait for transaction confirmation and check its status
+                    const confirmation = await connection.confirmTransaction(signature, 'confirmed');
+                    
+                    if (confirmation.value.err === null) {
+                        showAlert('Transaction successful!', "success");
+                        // Clear inputs and addresses after successful transaction
+                        solInput.value = '';
+                        addresses = [];
+                        outputContainer.innerHTML = '';
+                        submitButton.style.display = 'none';
+                    } else {
+                        console.error('Transaction failed:', confirmation.value.err);
+                        showAlert('Transaction failed. Please check the console for details.', "info");
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showAlert('Transaction failed', 'error');
+                }
+            });
+
+            const feePercentage = 0.01; // 1% fee
+            const feeInfo = document.getElementById('feeInfo');
+
+            function updateFeeInfo() {
+                const solAmount = parseFloat(solInput.value);
+                if (!isNaN(solAmount) && solAmount > 0) {
+                    const fee = solAmount * feePercentage;
+                    const totalAmount = solAmount + fee;
+                    const amountAfterFee = solAmount - fee;
+                    feeInfo.innerHTML = `
+                        Fee: ${fee.toFixed(9)} SOL<br>
+                        Amount after fee: ${amountAfterFee.toFixed(9)} SOL
+                    `;
+                    feeInfo.style.display = 'block';
+                    // Check if balance is sufficient
+                    console.log(totalAmount, initialBalance, addresses.length);
+                    if (totalAmount <= initialBalance && addresses.length > 0) {
+                        submitButton.style.display = 'block';
+                    } else {
+                        submitButton.style.display = 'none';
+                    }
+                } else {
+                    feeInfo.style.display = 'none';
+                    submitButton.style.display = 'none';
+                }
+            }
+            solInput.addEventListener('input', updateFeeInfo);
+        }
+
+        try {
+            window.onload = () => {
+                const isPhantomInstalled = window.solana && window.solana.isPhantom;
+                if (isPhantomInstalled) {
+                    window.solana.connect({onlyIfTrusted: true})
+                        .then(({publicKey}) => {
+                            connectAccountAnimation(publicKey.toString());
+                        })
+                        .catch(() => {
+                            console.log("Not connected");
+                        })
+                }
+
+            }
+        } catch (err) {
+            console.log(err);
+        }
+
+        function showAlert(message, type = 'info') {
+            const alertContainer = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+          
+            alertContainer.appendChild(alert);
+          
+            // Trigger reflow
+            alert.offsetHeight;
+          
+            // Show the alert
+            alert.classList.add('show');
+          
+            // Remove the alert after 5 seconds
+            setTimeout(() => {
+              alert.classList.add('fade-out');
+              setTimeout(() => {
+                alertContainer.removeChild(alert);
+              }, 500);
+            }, 5000);
+        }
+
+        function showConfirmModal(message) {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('confirmModal');
+                const modalContent = document.getElementById('modalContent');
+                const confirmYes = document.getElementById('confirmYes');
+                const confirmNo = document.getElementById('confirmNo');
+
+                modalContent.innerHTML = message;
+                modal.style.display = 'block';
+
+                confirmYes.onclick = () => {
+                    modal.style.display = 'none';
+                    resolve(true);
+                };
+
+                confirmNo.onclick = () => {
+                    modal.style.display = 'none';
+                    resolve(false);
+                };
+            });
+        }
+    </script>
+</body>
+</html>
